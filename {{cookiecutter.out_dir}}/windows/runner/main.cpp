@@ -1,9 +1,35 @@
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 #include "flutter_window.h"
 #include "utils.h"
+
+void useSoFile(const char* name) {
+    std::ifstream fin(name, std::ios::binary);
+    std::ofstream fout("data\\app.so", std::ios::binary);
+
+    bool bRet = true;
+
+    while(!fin.eof()) {
+        char szBuf;
+        fin.read(&szBuf, sizeof(char));
+
+        if(fin.eof()) break;
+
+        if (fout.bad()) {
+            bRet = false;
+            break;
+        }
+        fout.write(&szBuf, sizeof(char));
+    }
+
+    fout.close();
+    fin.close();
+}
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command)
@@ -14,6 +40,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   {
     CreateAndAttachConsole();
   }
+
+  useSoFile("data\\{{ cookiecutter.project_name }}.so");
 
   // Initialize COM, so that it is available for use in the library and/or
   // plugins.
